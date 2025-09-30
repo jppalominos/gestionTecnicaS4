@@ -3,1053 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Órdenes de Transporte SAP - Firebase</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        .firebase-status {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .status-connected {
-            background: #28a745;
-            color: white;
-        }
-        
-        .status-disconnected {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .status-connecting {
-            background: #ffc107;
-            color: #212529;
-        }
-        
-        .controls {
-            padding: 25px;
-            background: #f8f9fa;
-            border-bottom: 3px solid #e9ecef;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
-        }
-        
-        .btn-danger:hover {
-            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
-        }
-        
-        .btn-export {
-            background: linear-gradient(135deg, #17a2b8, #138496);
-            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
-        }
-        
-        .btn-export:hover {
-            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
-        }
-        
-        .search-box {
-            flex: 1;
-            min-width: 250px;
-            padding: 12px 20px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-        
-        .search-box:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .table-container {
-            overflow-x: auto;
-            margin: 20px;
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            font-size: 14px;
-        }
-        
-        th {
-            background: linear-gradient(135deg, #495057, #6c757d);
-            color: white;
-            padding: 15px 12px;
-            text-align: left;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e9ecef;
-            transition: background-color 0.2s ease;
-        }
-        
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .status-DES { background: #e3f2fd; color: #1565c0; }
-        .status-QAS { background: #fff3e0; color: #ef6c00; }
-        .status-PRD { background: #e8f5e8; color: #2e7d32; }
-        .status-error { background: #ffebee; color: #c62828; }
-        .status-pendiente { background: #f3e5f5; color: #7b1fa2; }
-        
-        .environment-check {
-            text-align: center;
-            font-size: 18px;
-        }
-        
-        .env-passed {
-            color: #28a745;
-        }
-        
-        .env-not-passed {
-            color: #dc3545;
-        }
-        
-        .priority {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        .priority-alta { background: #ffcdd2; color: #d32f2f; }
-        .priority-media { background: #fff9c4; color: #f57f17; }
-        .priority-baja { background: #c8e6c9; color: #388e3c; }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: modalSlideIn 0.3s ease;
-        }
-        
-        @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-        
-        .close:hover {
-            color: #333;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #495057;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 20px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            border-left: 5px solid #667eea;
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .stat-label {
-            color: #6c757d;
-            font-weight: 500;
-        }
-        
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-edit {
-            background: #17a2b8;
-            color: white;
-        }
-        
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .btn-small:hover {
-            transform: scale(1.05);
-        }
-        
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin-right: 15px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            z-index: 2000;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-        }
-        
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background: #28a745;
-        }
-        
-        .notification.error {
-            background: #dc3545;
-        }
-        
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            th, td {
-                padding: 8px 6px;
-                font-size: 12px;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-                padding: 20px;
-            }
-        }
-    </style>
+    <title>Gestión Técnica SAP S/4HANA</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="firebase-status" id="firebaseStatus">🔄 Conectando...</div>
-            <h1>🚚 Control de Órdenes de Transporte SAP</h1>
-            <p>Gestión colaborativa con Firebase - Tiempo real</p>
+            <h1>🎯 Sistema de Gestión Técnica SAP S/4HANA</h1>
+            <p>Plataforma integral para la gestión de proyectos de implementación</p>
         </div>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalTransports">0</div>
-                <div class="stat-label">Total Transportes</div>
+
+        <div class="dashboard">
+            <div class="kpi-card blue" onclick="switchTab('desarrollos')">
+                <div class="kpi-number" id="kpi-desarrollos">0</div>
+                <div class="kpi-label">📦 Desarrollos</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="pendingTransports">0</div>
-                <div class="stat-label">Pendientes</div>
+            <div class="kpi-card green" onclick="switchTab('desarrollos')">
+                <div class="kpi-number" id="kpi-completados">0</div>
+                <div class="kpi-label">✅ Completados</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="prodTransports">0</div>
-                <div class="stat-label">En Producción</div>
+            <div class="kpi-card orange" onclick="switchTab('desarrollos')">
+                <div class="kpi-number" id="kpi-en-desarrollo">0</div>
+                <div class="kpi-label">🔨 En Desarrollo</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="errorTransports">0</div>
-                <div class="stat-label">Con Errores</div>
+            <div class="kpi-card purple" onclick="switchTab('fiori')">
+                <div class="kpi-number" id="kpi-fiori">0</div>
+                <div class="kpi-label">🚀 Apps Fiori</div>
+            </div>
+            <div class="kpi-card teal" onclick="switchTab('transportes')">
+                <div class="kpi-number" id="kpi-transportes">0</div>
+                <div class="kpi-label">🚚 Transportes</div>
+            </div>
+            <div class="kpi-card red" onclick="switchTab('transportes')">
+                <div class="kpi-number" id="kpi-prod">0</div>
+                <div class="kpi-label">🎯 En Producción</div>
             </div>
         </div>
-        
-        <div class="controls">
-            <button class="btn" onclick="showAddModal()" id="addBtn">➕ Agregar Transporte</button>
-            <button class="btn btn-export" onclick="exportToCSV()" id="exportBtn">📊 Exportar CSV</button>
-            <button class="btn btn-danger" onclick="clearAllData()" id="clearBtn">🗑️ Limpiar Datos</button>
-            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Buscar por número de transporte, descripción o desarrollador...">
-        </div>
-        
-        <div class="table-container">
-            <div class="loading" id="loadingIndicator">
-                <div class="spinner"></div>
-                Cargando datos desde Firebase...
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('desarrollos')">📦 Desarrollos</button>
+                <button class="tab" onclick="switchTab('fiori')">🚀 Publicaciones Fiori</button>
+                <button class="tab" onclick="switchTab('transportes')">🚚 Órdenes de Transporte</button>
             </div>
-            <table id="transportTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Orden Transporte</th>
-                        <th>Tipo</th>
-                        <th>Descripción</th>
-                        <th>Desarrollador</th>
-                        <th>Fecha Creación</th>
-                        <th>DES</th>
-                        <th>QAS</th>
-                        <th>PRD</th>
-                        <th>Estado Actual</th>
-                        <th>Prioridad</th>
-                        <th>Fecha Transporte</th>
-                        <th>Observaciones</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="transportTableBody">
-                </tbody>
-            </table>
+        </div>
+
+        <div id="tab-desarrollos" class="tab-content active">
+            <div class="controls">
+                <button class="btn btn-success" onclick="showModal('desarrollos')">➕ Nuevo Desarrollo</button>
+                <button class="btn btn-export" onclick="exportToCSV('desarrollos')">📊 Exportar CSV</button>
+                <select class="filter-select" id="filter-modulo" onchange="applyFilters('desarrollos')">
+                    <option value="">Todos los módulos</option>
+                    <option value="FI">FI - Finanzas</option>
+                    <option value="CO">CO - Controlling</option>
+                    <option value="SD">SD - Ventas</option>
+                    <option value="MM">MM - Materiales</option>
+                    <option value="PP">PP - Producción</option>
+                    <option value="HR">HR - RRHH</option>
+                    <option value="PM">PM - Mantenimiento</option>
+                    <option value="QM">QM - Calidad</option>
+                    <option value="WM">WM - Almacén</option>
+                    <option value="BASIS">BASIS</option>
+                </select>
+                <select class="filter-select" id="filter-estado-dev" onchange="applyFilters('desarrollos')">
+                    <option value="">Todos los estados</option>
+                    <option value="desarrollo">En Desarrollo</option>
+                    <option value="pruebas">En Pruebas</option>
+                    <option value="completado">Completado</option>
+                    <option value="pendiente">Pendiente</option>
+                </select>
+                <input type="text" class="search-box" id="search-desarrollos" placeholder="🔍 Buscar..." oninput="applyFilters('desarrollos')">
+            </div>
+            <div class="table-container">
+                <div class="loading" id="loading-desarrollos"><div class="spinner"></div>Cargando...</div>
+                <table id="table-desarrollos" style="display:none;">
+                    <thead><tr><th>Nombre</th><th>Tipo</th><th>Módulo</th><th>Desarrollador</th><th>Estado</th><th>Complejidad</th><th>OT</th><th>Inicio</th><th>Fin</th><th>Descripción</th><th>Acciones</th></tr></thead>
+                    <tbody id="tbody-desarrollos"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-fiori" class="tab-content">
+            <div class="controls">
+                <button class="btn btn-success" onclick="showModal('fiori')">➕ Nueva Publicación</button>
+                <button class="btn btn-export" onclick="exportToCSV('fiori')">📊 Exportar CSV</button>
+                <select class="filter-select" id="filter-ambiente-fiori" onchange="applyFilters('fiori')">
+                    <option value="">Todos los ambientes</option>
+                    <option value="DES">DES</option>
+                    <option value="QAS">QAS</option>
+                    <option value="PRD">PRD</option>
+                </select>
+                <select class="filter-select" id="filter-estado-fiori" onchange="applyFilters('fiori')">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="publicado">Publicado</option>
+                    <option value="error">Error</option>
+                </select>
+                <input type="text" class="search-box" id="search-fiori" placeholder="🔍 Buscar..." oninput="applyFilters('fiori')">
+            </div>
+            <div class="table-container">
+                <div class="loading" id="loading-fiori"><div class="spinner"></div>Cargando...</div>
+                <table id="table-fiori" style="display:none;">
+                    <thead><tr><th>Nombre</th><th>ID Semántico</th><th>Catálogo</th><th>Grupo</th><th>Roles</th><th>URL</th><th>Estado</th><th>Ambiente</th><th>Fecha</th><th>Responsable</th><th>Acciones</th></tr></thead>
+                    <tbody id="tbody-fiori"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-transportes" class="tab-content">
+            <div class="controls">
+                <button class="btn btn-success" onclick="showModal('transportes')">➕ Nuevo Transporte</button>
+                <button class="btn btn-export" onclick="exportToCSV('transportes')">📊 Exportar CSV</button>
+                <select class="filter-select" id="filter-estado-ot" onchange="applyFilters('transportes')">
+                    <option value="">Todos los estados</option>
+                    <option value="DES">DES</option>
+                    <option value="QAS">QAS</option>
+                    <option value="PRD">PRD</option>
+                    <option value="error">Error</option>
+                    <option value="pendiente">Pendiente</option>
+                </select>
+                <select class="filter-select" id="filter-prioridad" onchange="applyFilters('transportes')">
+                    <option value="">Todas las prioridades</option>
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                </select>
+                <input type="text" class="search-box" id="search-transportes" placeholder="🔍 Buscar..." oninput="applyFilters('transportes')">
+            </div>
+            <div class="table-container">
+                <div class="loading" id="loading-transportes"><div class="spinner"></div>Cargando...</div>
+                <table id="table-transportes" style="display:none;">
+                    <thead><tr><th>Orden</th><th>Tipo</th><th>Descripción</th><th>Desarrollador</th><th>Creación</th><th>DES</th><th>QAS</th><th>PRD</th><th>Estado</th><th>Prioridad</th><th>Objetos</th><th>Acciones</th></tr></thead>
+                    <tbody id="tbody-transportes"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Modal para agregar/editar transporte -->
-    <div id="transportModal" class="modal">
+    <div id="modal-desarrollos" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Agregar Orden de Transporte</h2>
-            
-            <form id="transportForm">
-                <div class="form-group">
-                    <label for="transportOrder">Orden de Transporte:</label>
-                    <input type="text" id="transportOrder" name="transportOrder" placeholder="ej. DESK900001" required>
+            <span class="close" onclick="closeModal('desarrollos')">&times;</span>
+            <h2 id="modal-title-desarrollos">Nuevo Desarrollo</h2>
+            <form id="form-desarrollos">
+                <div class="form-row">
+                    <div class="form-group"><label>Nombre *</label><input type="text" id="dev-nombre" required></div>
+                    <div class="form-group"><label>Tipo *</label><select id="dev-tipo" required><option value="">Seleccionar</option><option value="Programa ABAP">Programa ABAP</option><option value="Clase">Clase</option><option value="Function Module">Function Module</option><option value="Smartform">Smartform</option><option value="Adobe Form">Adobe Form</option><option value="CDS View">CDS View</option><option value="Fiori App">Fiori App</option><option value="Enhancement">Enhancement</option><option value="BADI">BADI</option><option value="Tabla Z">Tabla Z</option></select></div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="transportType">Tipo:</label>
-                    <select id="transportType" name="transportType" required>
-                        <option value="">Seleccionar tipo</option>
-                        <option value="Desarrollo">Desarrollo</option>
-                        <option value="Corrección">Corrección</option>
-                        <option value="Customizing">Customizing</option>
-                        <option value="Master Data">Master Data</option>
-                        <option value="Autorización">Autorización</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group"><label>Módulo *</label><select id="dev-modulo" required><option value="">Seleccionar</option><option value="FI">FI</option><option value="CO">CO</option><option value="SD">SD</option><option value="MM">MM</option><option value="PP">PP</option><option value="HR">HR</option><option value="PM">PM</option><option value="QM">QM</option><option value="WM">WM</option><option value="BASIS">BASIS</option></select></div>
+                    <div class="form-group"><label>Desarrollador *</label><input type="text" id="dev-desarrollador" required></div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="description">Descripción:</label>
-                    <textarea id="description" name="description" rows="3" placeholder="Descripción detallada del transporte" required></textarea>
+                <div class="form-row">
+                    <div class="form-group"><label>Estado *</label><select id="dev-estado" required><option value="">Seleccionar</option><option value="pendiente">Pendiente</option><option value="desarrollo">En Desarrollo</option><option value="pruebas">En Pruebas</option><option value="completado">Completado</option></select></div>
+                    <div class="form-group"><label>Complejidad *</label><select id="dev-complejidad" required><option value="">Seleccionar</option><option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta</option></select></div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="developer">Desarrollador:</label>
-                    <input type="text" id="developer" name="developer" placeholder="Nombre del desarrollador" required>
+                <div class="form-row">
+                    <div class="form-group"><label>OT Asociada</label><input type="text" id="dev-ot"></div>
+                    <div class="form-group"><label>Fecha Inicio *</label><input type="date" id="dev-fecha-inicio" required></div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="creationDate">Fecha de Creación:</label>
-                    <input type="date" id="creationDate" name="creationDate" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="status">Estado Actual (Último ambiente):</label>
-                    <select id="status" name="status" required>
-                        <option value="">Seleccionar estado</option>
-                        <option value="DES">DES - Desarrollo</option>
-                        <option value="QAS">QAS - Quality Assurance</option>
-                        <option value="PRD">PRD - Producción</option>
-                        <option value="error">Error en transporte</option>
-                        <option value="pendiente">Pendiente de creación</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Ambientes por los que ha pasado:</label>
-                    <div style="display: flex; gap: 20px; margin-top: 10px;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
-                            <input type="checkbox" id="passedDES" name="passedDES" style="width: auto;">
-                            <span>✅ DES (Desarrollo)</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
-                            <input type="checkbox" id="passedQAS" name="passedQAS" style="width: auto;">
-                            <span>🧪 QAS (Quality)</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
-                            <input type="checkbox" id="passedPRD" name="passedPRD" style="width: auto;">
-                            <span>🚀 PRD (Producción)</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="priority">Prioridad:</label>
-                    <select id="priority" name="priority" required>
-                        <option value="">Seleccionar prioridad</option>
-                        <option value="alta">Alta</option>
-                        <option value="media">Media</option>
-                        <option value="baja">Baja</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="transportDate">Fecha de Transporte:</label>
-                    <input type="datetime-local" id="transportDate" name="transportDate">
-                </div>
-                
-                <div class="form-group">
-                    <label for="observations">Observaciones:</label>
-                    <textarea id="observations" name="observations" rows="3" placeholder="Observaciones adicionales, errores, comentarios..."></textarea>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <button type="submit" class="btn">💾 Guardar</button>
-                    <button type="button" class="btn btn-danger" onclick="closeModal()" style="margin-left: 15px;">❌ Cancelar</button>
+                <div class="form-group"><label>Fecha Fin</label><input type="date" id="dev-fecha-fin"></div>
+                <div class="form-group"><label>Descripción *</label><textarea id="dev-descripcion" required></textarea></div>
+                <div class="form-group"><label>Observaciones</label><textarea id="dev-observaciones"></textarea></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">💾 Guardar</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('desarrollos')">❌ Cancelar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Notificaciones -->
+    <div id="modal-fiori" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('fiori')">&times;</span>
+            <h2 id="modal-title-fiori">Nueva Publicación Fiori</h2>
+            <form id="form-fiori">
+                <div class="form-row">
+                    <div class="form-group"><label>Nombre *</label><input type="text" id="fiori-nombre" required></div>
+                    <div class="form-group"><label>ID Semántico *</label><input type="text" id="fiori-id" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Catálogo *</label><input type="text" id="fiori-catalogo" required></div>
+                    <div class="form-group"><label>Grupo *</label><input type="text" id="fiori-grupo" required></div>
+                </div>
+                <div class="form-group"><label>Roles *</label><input type="text" id="fiori-roles" required></div>
+                <div class="form-group"><label>URL *</label><input type="url" id="fiori-url" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Estado *</label><select id="fiori-estado" required><option value="">Seleccionar</option><option value="pendiente">Pendiente</option><option value="publicado">Publicado</option><option value="error">Error</option></select></div>
+                    <div class="form-group"><label>Ambiente *</label><select id="fiori-ambiente" required><option value="">Seleccionar</option><option value="DES">DES</option><option value="QAS">QAS</option><option value="PRD">PRD</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Fecha</label><input type="datetime-local" id="fiori-fecha"></div>
+                    <div class="form-group"><label>Responsable *</label><input type="text" id="fiori-responsable" required></div>
+                </div>
+                <div class="form-group"><label>Observaciones</label><textarea id="fiori-observaciones"></textarea></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">💾 Guardar</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('fiori')">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-transportes" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('transportes')">&times;</span>
+            <h2 id="modal-title-transportes">Nueva Orden de Transporte</h2>
+            <form id="form-transportes">
+                <div class="form-row">
+                    <div class="form-group"><label>Número *</label><input type="text" id="ot-numero" required></div>
+                    <div class="form-group"><label>Tipo *</label><select id="ot-tipo" required><option value="">Seleccionar</option><option value="Desarrollo">Desarrollo</option><option value="Corrección">Corrección</option><option value="Customizing">Customizing</option><option value="Master Data">Master Data</option><option value="Autorización">Autorización</option></select></div>
+                </div>
+                <div class="form-group"><label>Descripción *</label><textarea id="ot-descripcion" required></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Desarrollador *</label><input type="text" id="ot-desarrollador" required></div>
+                    <div class="form-group"><label>Fecha Creación *</label><input type="date" id="ot-fecha-creacion" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Estado *</label><select id="ot-estado" required><option value="">Seleccionar</option><option value="pendiente">Pendiente</option><option value="DES">DES</option><option value="QAS">QAS</option><option value="PRD">PRD</option><option value="error">Error</option></select></div>
+                    <div class="form-group"><label>Prioridad *</label><select id="ot-prioridad" required><option value="">Seleccionar</option><option value="alta">Alta</option><option value="media">Media</option><option value="baja">Baja</option></select></div>
+                </div>
+                <div class="form-group"><label>Ambientes:</label><div class="checkbox-group"><label><input type="checkbox" id="ot-passed-des"> DES</label><label><input type="checkbox" id="ot-passed-qas"> QAS</label><label><input type="checkbox" id="ot-passed-prd"> PRD</label></div></div>
+                <div class="form-group"><label>Objetos</label><textarea id="ot-objetos"></textarea></div>
+                <div class="form-group"><label>Fecha Transporte</label><input type="datetime-local" id="ot-fecha-transporte"></div>
+                <div class="form-group"><label>Observaciones</label><textarea id="ot-observaciones"></textarea></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">💾 Guardar</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('transportes')">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="notification" class="notification"></div>
 
-    <!-- Firebase SDK v9 - Modular -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, push, set, onValue, remove, off } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-        // Tu configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDDkD8NAn7e5HqpMEx-gXVNhW7t04Culw8",
-            authDomain: "transport-order-fe2db.firebaseapp.com",
-            databaseURL: "https://transport-order-fe2db-default-rtdb.firebaseio.com",
-            projectId: "transport-order-fe2db",
-            storageBucket: "transport-order-fe2db.firebasestorage.app",
-            messagingSenderId: "1063220191519",
-            appId: "1:1063220191519:web:1c035e685f3e0a72a7902a"
-        };
-
-        // Variables globales
-        let database = null;
-        let app = null;
-        let transports = [];
-        let editingIndex = -1;
-        let currentTransportId = null;
-
-        // Inicializar Firebase
-        try {
-            updateFirebaseStatus('connecting', '🔄 Conectando...');
-            app = initializeApp(firebaseConfig);
-            database = getDatabase(app);
-            
-            // Escuchar estado de conexión
-            const connectedRef = ref(database, '.info/connected');
-            onValue(connectedRef, (snapshot) => {
-                if (snapshot.val() === true) {
-                    updateFirebaseStatus('connected', '✅ Conectado - Tiempo Real');
-                    loadTransports();
-                } else {
-                    updateFirebaseStatus('disconnected', '❌ Desconectado');
-                }
-            });
-            
-            console.log('✅ Firebase inicializado correctamente');
-            
-        } catch (error) {
-            console.error('❌ Error inicializando Firebase:', error);
-            updateFirebaseStatus('disconnected', '❌ Error de conexión');
-            showNotification('Error al conectar con Firebase: ' + error.message, 'error');
-        }
-
-        // Actualizar estado de Firebase
-        function updateFirebaseStatus(status, text) {
-            const statusElement = document.getElementById('firebaseStatus');
-            if (statusElement) {
-                statusElement.textContent = text;
-                statusElement.className = `firebase-status status-${status}`;
-            }
-        }
-
-        // Cargar transportes desde Firebase
-        function loadTransports() {
-            if (!database) return;
-            
-            const transportsRef = ref(database, 'transports');
-            onValue(transportsRef, (snapshot) => {
-                const data = snapshot.val();
-                transports = data ? Object.keys(data).map(key => ({ 
-                    id: key, 
-                    ...data[key],
-                    // Asegurar campos por defecto
-                    passedDES: data[key].passedDES || false,
-                    passedQAS: data[key].passedQAS || false,
-                    passedPRD: data[key].passedPRD || false,
-                    observations: data[key].observations || '',
-                    transportDate: data[key].transportDate || ''
-                })) : [];
-                
-                // Ordenar por fecha de creación descendente
-                transports.sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate));
-                
-                document.getElementById('loadingIndicator').style.display = 'none';
-                document.getElementById('transportTable').style.display = 'table';
-                
-                renderTable();
-                updateStats();
-                console.log('📊 Datos cargados desde Firebase:', transports.length, 'transportes');
-            }, (error) => {
-                console.error('❌ Error cargando datos:', error);
-                showNotification('Error al cargar datos: ' + error.message, 'error');
-            });
-        }
-
-        // Guardar transporte en Firebase
-        function saveTransport(transportData, isEdit = false, transportId = null) {
-            if (!database) {
-                showNotification('No hay conexión con Firebase', 'error');
-                return;
-            }
-
-            // Agregar timestamp
-            transportData.lastModified = new Date().toISOString();
-            if (!isEdit) {
-                transportData.created = new Date().toISOString();
-            }
-
-            if (isEdit && transportId) {
-                // Actualizar transporte existente
-                const transportRef = ref(database, 'transports/' + transportId);
-                set(transportRef, transportData)
-                    .then(() => {
-                        console.log('✅ Transporte actualizado exitosamente');
-                        showNotification('Transporte actualizado correctamente', 'success');
-                    })
-                    .catch((error) => {
-                        console.error('❌ Error actualizando transporte:', error);
-                        showNotification('Error al actualizar: ' + error.message, 'error');
-                    });
-            } else {
-                // Crear nuevo transporte
-                const transportsRef = ref(database, 'transports');
-                const newTransportRef = push(transportsRef);
-                set(newTransportRef, transportData)
-                    .then(() => {
-                        console.log('✅ Transporte guardado exitosamente');
-                        showNotification('Transporte agregado correctamente', 'success');
-                    })
-                    .catch((error) => {
-                        console.error('❌ Error guardando transporte:', error);
-                        showNotification('Error al guardar: ' + error.message, 'error');
-                    });
-            }
-        }
-
-        // Eliminar transporte
-        window.deleteTransport = function(index) {
-            if (!database || !transports[index]) return;
-
-            const transport = transports[index];
-            const confirmDelete = confirm(`¿Estás seguro de que quieres eliminar la orden "${transport.transportOrder}"?\n\nEsta acción no se puede deshacer y será visible para todos los usuarios.`);
-            
-            if (confirmDelete) {
-                const transportRef = ref(database, 'transports/' + transport.id);
-                remove(transportRef)
-                    .then(() => {
-                        console.log('✅ Transporte eliminado exitosamente');
-                        showNotification('Transporte eliminado correctamente', 'success');
-                    })
-                    .catch((error) => {
-                        console.error('❌ Error eliminando transporte:', error);
-                        showNotification('Error al eliminar: ' + error.message, 'error');
-                    });
-            }
-        }
-
-        // Limpiar todos los datos
-        window.clearAllData = function() {
-            if (!database) {
-                showNotification('No hay conexión con Firebase', 'error');
-                return;
-            }
-
-            const confirmClear = confirm('🚨 ¡ATENCIÓN! ¿Estás COMPLETAMENTE seguro?\n\nEsto eliminará TODOS los transportes de la base de datos para TODOS los usuarios conectados.\n\n⚠️ Esta acción NO se puede deshacer.\n\nEscribe "ELIMINAR TODO" para confirmar:');
-            
-            if (confirmClear) {
-                const confirmText = prompt('Para confirmar, escribe exactamente: ELIMINAR TODO');
-                if (confirmText === 'ELIMINAR TODO') {
-                    const transportsRef = ref(database, 'transports');
-                    remove(transportsRef)
-                        .then(() => {
-                            console.log('✅ Todos los datos eliminados');
-                            showNotification('Todos los transportes han sido eliminados', 'success');
-                        })
-                        .catch((error) => {
-                            console.error('❌ Error eliminando datos:', error);
-                            showNotification('Error al eliminar datos: ' + error.message, 'error');
-                        });
-                } else {
-                    showNotification('Confirmación incorrecta. Operación cancelada.', 'error');
-                }
-            }
-        }
-
-        // Funciones globales para el HTML
-        window.showAddModal = function() {
-            editingIndex = -1;
-            currentTransportId = null;
-            document.getElementById('modalTitle').textContent = 'Agregar Orden de Transporte';
-            document.getElementById('transportForm').reset();
-            document.getElementById('transportModal').style.display = 'block';
-        }
-
-        window.editTransport = function(index) {
-            if (!transports[index]) return;
-            
-            editingIndex = index;
-            const transport = transports[index];
-            currentTransportId = transport.id;
-            
-            document.getElementById('modalTitle').textContent = 'Editar Orden de Transporte';
-            
-            // Llenar formulario
-            document.getElementById('transportOrder').value = transport.transportOrder || '';
-            document.getElementById('transportType').value = transport.transportType || '';
-            document.getElementById('description').value = transport.description || '';
-            document.getElementById('developer').value = transport.developer || '';
-            document.getElementById('creationDate').value = transport.creationDate || '';
-            document.getElementById('status').value = transport.status || '';
-            document.getElementById('passedDES').checked = transport.passedDES || false;
-            document.getElementById('passedQAS').checked = transport.passedQAS || false;
-            document.getElementById('passedPRD').checked = transport.passedPRD || false;
-            document.getElementById('priority').value = transport.priority || '';
-            document.getElementById('transportDate').value = transport.transportDate || '';
-            document.getElementById('observations').value = transport.observations || '';
-            
-            document.getElementById('transportModal').style.display = 'block';
-        }
-
-        window.closeModal = function() {
-            document.getElementById('transportModal').style.display = 'none';
-            editingIndex = -1;
-            currentTransportId = null;
-        }
-
-        // Renderizar tabla
-        function renderTable(data = transports) {
-            const tbody = document.getElementById('transportTableBody');
-            tbody.innerHTML = '';
-            
-            if (data.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="13" style="text-align: center; padding: 40px; color: #6c757d; font-style: italic;">No hay órdenes de transporte registradas.<br><br>¡Agrega la primera orden usando el botón "➕ Agregar Transporte"!</td>';
-                tbody.appendChild(row);
-                return;
-            }
-            
-            data.forEach((transport, index) => {
-                // Encontrar el índice real en el array original
-                const realIndex = transports.findIndex(t => t.id === transport.id);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${transport.transportOrder || 'N/A'}</strong></td>
-                    <td>${transport.transportType || 'N/A'}</td>
-                    <td title="${transport.description || ''}">${truncateText(transport.description || 'N/A', 50)}</td>
-                    <td>${transport.developer || 'N/A'}</td>
-                    <td>${transport.creationDate ? formatDate(transport.creationDate) : 'N/A'}</td>
-                    <td class="environment-check">${transport.passedDES ? '<span class="env-passed">✅</span>' : '<span class="env-not-passed">❌</span>'}</td>
-                    <td class="environment-check">${transport.passedQAS ? '<span class="env-passed">✅</span>' : '<span class="env-not-passed">❌</span>'}</td>
-                    <td class="environment-check">${transport.passedPRD ? '<span class="env-passed">✅</span>' : '<span class="env-not-passed">❌</span>'}</td>
-                    <td><span class="status status-${transport.status}">${getStatusText(transport.status)}</span></td>
-                    <td><span class="priority priority-${transport.priority}">${getPriorityText(transport.priority)}</span></td>
-                    <td>${transport.transportDate ? formatDateTime(transport.transportDate) : 'No programado'}</td>
-                    <td title="${transport.observations || ''}">${truncateText(transport.observations || '', 30)}</td>
-                    <td class="actions">
-                        <button class="btn-small btn-edit" onclick="editTransport(${realIndex})" title="Editar">✏️</button>
-                        <button class="btn-small btn-delete" onclick="deleteTransport(${realIndex})" title="Eliminar">🗑️</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Actualizar estadísticas
-        function updateStats() {
-            document.getElementById('totalTransports').textContent = transports.length;
-            document.getElementById('pendingTransports').textContent = transports.filter(t => t.status === 'pendiente' || t.status === 'DES').length;
-            document.getElementById('prodTransports').textContent = transports.filter(t => t.status === 'PRD').length;
-            document.getElementById('errorTransports').textContent = transports.filter(t => t.status === 'error').length;
-        }
-
-        // Funciones auxiliares
-        function getStatusText(status) {
-            const statusMap = {
-                'DES': 'DES - Desarrollo',
-                'QAS': 'QAS - Quality',
-                'PRD': 'PRD - Producción',
-                'error': 'Error',
-                'pendiente': 'Pendiente'
-            };
-            return statusMap[status] || status || 'N/A';
-        }
-
-        function getPriorityText(priority) {
-            const priorityMap = {
-                'alta': 'ALTA',
-                'media': 'MEDIA',
-                'baja': 'BAJA'
-            };
-            return priorityMap[priority] || priority || 'N/A';
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('es-ES');
-            } catch (e) {
-                return dateString;
-            }
-        }
-
-        function formatDateTime(dateTimeString) {
-            if (!dateTimeString) return 'N/A';
-            try {
-                const date = new Date(dateTimeString);
-                return date.toLocaleString('es-ES');
-            } catch (e) {
-                return dateTimeString;
-            }
-        }
-
-        function truncateText(text, maxLength) {
-            if (!text) return '';
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
-
-        // Mostrar notificaciones
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 4000);
-        }
-
-        // Exportar a CSV
-        window.exportToCSV = function() {
-            if (transports.length === 0) {
-                showNotification('No hay datos para exportar', 'error');
-                return;
-            }
-            
-            try {
-                const headers = ['Orden Transporte', 'Tipo', 'Descripción', 'Desarrollador', 'Fecha Creación', 'DES', 'QAS', 'PRD', 'Estado Actual', 'Prioridad', 'Fecha Transporte', 'Observaciones'];
-                
-                const csvContent = [
-                    headers.join(','),
-                    ...transports.map(transport => [
-                        `"${transport.transportOrder || ''}"`,
-                        `"${transport.transportType || ''}"`,
-                        `"${(transport.description || '').replace(/"/g, '""')}"`,
-                        `"${transport.developer || ''}"`,
-                        transport.creationDate || '',
-                        transport.passedDES ? 'Sí' : 'No',
-                        transport.passedQAS ? 'Sí' : 'No',
-                        transport.passedPRD ? 'Sí' : 'No',
-                        `"${getStatusText(transport.status)}"`,
-                        `"${getPriorityText(transport.priority)}"`,
-                        transport.transportDate || 'No programado',
-                        `"${(transport.observations || '').replace(/"/g, '""')}"`
-                    ].join(','))
-                ].join('\n');
-                
-                // Agregar BOM para UTF-8
-                const BOM = '\uFEFF';
-                const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                const fileName = `ordenes_transporte_sap_${new Date().toISOString().split('T')[0]}.csv`;
-                
-                link.setAttribute('href', url);
-                link.setAttribute('download', fileName);
-                link.style.visibility = 'hidden';
-                
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                setTimeout(() => {
-                    URL.revokeObjectURL(url);
-                }, 1000);
-                
-                showNotification(`Datos exportados correctamente: ${fileName}`, 'success');
-                
-            } catch (error) {
-                console.error('❌ Error al exportar:', error);
-                showNotification('Error al exportar datos: ' + error.message, 'error');
-            }
-        }
-
-        // Búsqueda en tiempo real
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            if (!searchTerm) {
-                renderTable();
-                return;
-            }
-            
-            const filteredData = transports.filter(transport => 
-                (transport.transportOrder || '').toLowerCase().includes(searchTerm) ||
-                (transport.description || '').toLowerCase().includes(searchTerm) ||
-                (transport.developer || '').toLowerCase().includes(searchTerm) ||
-                (transport.transportType || '').toLowerCase().includes(searchTerm) ||
-                (transport.observations || '').toLowerCase().includes(searchTerm)
-            );
-            renderTable(filteredData);
-        });
-
-        // Manejo del formulario
-        document.getElementById('transportForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!database) {
-                showNotification('No hay conexión con Firebase', 'error');
-                return;
-            }
-            
-            // Recopilar datos del formulario
-            const formData = new FormData(this);
-            const transport = {};
-            
-            for (let [key, value] of formData.entries()) {
-                transport[key] = value.trim();
-            }
-            
-            // Manejar checkboxes por separado
-            transport.passedDES = document.getElementById('passedDES').checked;
-            transport.passedQAS = document.getElementById('passedQAS').checked;
-            transport.passedPRD = document.getElementById('passedPRD').checked;
-            
-            // Validaciones básicas
-            if (!transport.transportOrder) {
-                showNotification('El número de orden de transporte es requerido', 'error');
-                return;
-            }
-            
-            if (editingIndex === -1) {
-                // Verificar duplicados solo al crear
-                const duplicate = transports.find(t => 
-                    t.transportOrder.toLowerCase() === transport.transportOrder.toLowerCase()
-                );
-                if (duplicate) {
-                    showNotification('Ya existe una orden de transporte con ese número', 'error');
-                    return;
-                }
-            }
-            
-            console.log('💾 Guardando transporte:', transport);
-            
-            // Guardar en Firebase
-            saveTransport(transport, editingIndex !== -1, currentTransportId);
-            
-            // Cerrar modal
-            closeModal();
-        });
-
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('transportModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        // Configurar fecha por defecto en formularios
-        window.addEventListener('load', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('creationDate').value = today;
-        });
-
-        // Hacer disponibles las funciones necesarias globalmente
-        window.renderTable = renderTable;
-        window.updateStats = updateStats;
-        window.showNotification = showNotification;
-
-        console.log('🚀 Aplicación inicializada correctamente');
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
