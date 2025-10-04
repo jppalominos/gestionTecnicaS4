@@ -3,242 +3,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión Técnica SAP S/4HANA</title>
+    <title>Control Técnico SAP</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="firebase-status" id="firebaseStatus">🔄 Conectando...</div>
-            <h1>🎯 Sistema de Gestión Técnica SAP S/4HANA</h1>
-            <p>Plataforma integral para la gestión de proyectos de implementación</p>
-        </div>
+        <header>
+            <h1>🚀 Control Técnico - Proyecto SAP</h1>
+            <div class="header-info">
+                <span id="currentDate"></span>
+                <span id="firebaseStatus" class="status-badge">🔴 Desconectado</span>
+            </div>
+        </header>
 
-        <div class="dashboard">
-            <div class="kpi-card blue" onclick="switchTab('desarrollos')">
-                <div class="kpi-number" id="kpi-desarrollos">0</div>
-                <div class="kpi-label">📦 Desarrollos</div>
+        <!-- KPIs Dashboard -->
+        <section class="kpis-section">
+            <div class="kpi-group">
+                <div class="kpi-group-header">
+                    <div class="kpi-group-icon">📦</div>
+                    <h3 class="kpi-group-title">Desarrollos</h3>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-card-small">
+                        <h4 id="totalDesarrollos" class="kpi-orange">0</h4>
+                        <p>Total Desarrollos</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="desarrollosDEV" class="kpi-orange">0</h4>
+                        <p>En DEV</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="desarrollosQAS" class="kpi-orange">0</h4>
+                        <p>En QAS</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="desarrollosPRD" class="kpi-orange">0</h4>
+                        <p>En PRD</p>
+                    </div>
+                </div>
             </div>
-            <div class="kpi-card green" onclick="switchTab('desarrollos')">
-                <div class="kpi-number" id="kpi-completados">0</div>
-                <div class="kpi-label">✅ Completados</div>
-            </div>
-            <div class="kpi-card orange" onclick="switchTab('desarrollos')">
-                <div class="kpi-number" id="kpi-en-desarrollo">0</div>
-                <div class="kpi-label">🔨 En Desarrollo</div>
-            </div>
-            <div class="kpi-card purple" onclick="switchTab('fiori')">
-                <div class="kpi-number" id="kpi-fiori">0</div>
-                <div class="kpi-label">🚀 Apps Fiori</div>
-            </div>
-            <div class="kpi-card teal" onclick="switchTab('transportes')">
-                <div class="kpi-number" id="kpi-transportes">0</div>
-                <div class="kpi-label">🚚 Transportes</div>
-            </div>
-            <div class="kpi-card red" onclick="switchTab('transportes')">
-                <div class="kpi-number" id="kpi-prod">0</div>
-                <div class="kpi-label">🎯 En Producción</div>
-            </div>
-        </div>
 
-        <div class="tabs-container">
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('desarrollos')">📦 Desarrollos</button>
-                <button class="tab" onclick="switchTab('fiori')">🚀 Publicaciones Fiori</button>
-                <button class="tab" onclick="switchTab('transportes')">🚚 Órdenes de Transporte</button>
+            <div class="kpi-group">
+                <div class="kpi-group-header">
+                    <div class="kpi-group-icon">🚀</div>
+                    <h3 class="kpi-group-title">Fiori Launchpad</h3>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-card-small">
+                        <h4 id="totalFiori" class="kpi-dark">0</h4>
+                        <p>Total Publicaciones</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="fioriEstandar" class="kpi-dark">0</h4>
+                        <p>Tx Estándar</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="fioriZ" class="kpi-dark">0</h4>
+                        <p>Tx Z</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="fioriApps" class="kpi-dark">0</h4>
+                        <p>App Fiori</p>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div id="tab-desarrollos" class="tab-content active">
-            <div class="controls">
-                <button class="btn btn-success" onclick="showModal('desarrollos')">➕ Nuevo Desarrollo</button>
-                <button class="btn btn-export" onclick="exportToCSV('desarrollos')">📊 Exportar CSV</button>
-                <select class="filter-select" id="filter-modulo" onchange="applyFilters('desarrollos')">
-                    <option value="">Todos los módulos</option>
-                    <option value="FI">FI - Finanzas</option>
-                    <option value="CO">CO - Controlling</option>
-                    <option value="SD">SD - Ventas</option>
-                    <option value="MM">MM - Materiales</option>
-                    <option value="PP">PP - Producción</option>
-                    <option value="HR">HR - RRHH</option>
-                    <option value="PM">PM - Mantenimiento</option>
-                    <option value="QM">QM - Calidad</option>
-                    <option value="WM">WM - Almacén</option>
-                    <option value="BASIS">BASIS</option>
-                </select>
-                <select class="filter-select" id="filter-estado-dev" onchange="applyFilters('desarrollos')">
-                    <option value="">Todos los estados</option>
-                    <option value="desarrollo">En Desarrollo</option>
-                    <option value="pruebas">En Pruebas</option>
-                    <option value="completado">Completado</option>
-                    <option value="pendiente">Pendiente</option>
-                </select>
-                <input type="text" class="search-box" id="search-desarrollos" placeholder="🔍 Buscar..." oninput="applyFilters('desarrollos')">
+            <div class="kpi-group">
+                <div class="kpi-group-header">
+                    <div class="kpi-group-icon">🔄</div>
+                    <h3 class="kpi-group-title">Órdenes Transporte</h3>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-card-small">
+                        <h4 id="totalOTs" class="kpi-red">0</h4>
+                        <p>Total OTs</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="otsDEV" class="kpi-red">0</h4>
+                        <p>DEV</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="otsQAS" class="kpi-red">0</h4>
+                        <p>QAS</p>
+                    </div>
+                    <div class="kpi-card-small">
+                        <h4 id="otsPRD" class="kpi-red">0</h4>
+                        <p>PRD</p>
+                    </div>
+                </div>
             </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="desarrollos">Desarrollos</button>
+            <button class="tab-btn" data-tab="fiori">Fiori Launchpad</button>
+            <button class="tab-btn" data-tab="transportes">Órdenes Transporte</button>
+        </nav>
+
+        <!-- Tab Content: Desarrollos -->
+        <div class="tab-content active" id="desarrollos">
+            <div class="section-header">
+                <h2>Gestión de Desarrollos</h2>
+                <button class="btn-primary" onclick="openModal('desarrollosModal')">+ Nuevo Desarrollo</button>
+            </div>
+            
+            <!-- Filtros Desarrollos -->
+            <div class="filters-container">
+                <div class="search-box">
+                    <input type="text" id="searchDesarrollos" placeholder="Buscar por ID, nombre, desarrollador...">
+                </div>
+                <div class="filter-group">
+                    <select class="filter-select" id="filterDesarrollosTipo">
+                        <option value="">Todos los Tipos</option>
+                        <option value="Report">Report</option>
+                        <option value="Function">Function</option>
+                        <option value="Class">Class</option>
+                        <option value="Enhancement">Enhancement</option>
+                        <option value="WebService">Web Service</option>
+                        <option value="Smartform">Smartform</option>
+                        <option value="Adobe Form">Adobe Form</option>
+                        <option value="BADI">BADI</option>
+                        <option value="User Exit">User Exit</option>
+                        <option value="BTE">BTE</option>
+                        <option value="Workflow">Workflow</option>
+                        <option value="Interface">Interface</option>
+                    </select>
+                    <select class="filter-select" id="filterDesarrollosEstado">
+                        <option value="">Todos los Estados</option>
+                        <option value="Planificado">Planificado</option>
+                        <option value="En Desarrollo">En Desarrollo</option>
+                        <option value="Testing QAS">Testing QAS</option>
+                        <option value="En Producción">En Producción</option>
+                        <option value="Completado">Completado</option>
+                    </select>
+                    <select class="filter-select" id="filterDesarrollosModulo">
+                        <option value="">Todos los Módulos</option>
+                        <option value="FI">FI - Finanzas</option>
+                        <option value="CO">CO - Controlling</option>
+                        <option value="MM">MM - Materiales</option>
+                        <option value="SD">SD - Ventas</option>
+                        <option value="PP">PP - Producción</option>
+                        <option value="QM">QM - Calidad</option>
+                        <option value="PM">PM - Mantenimiento</option>
+                        <option value="HR">HR - Recursos Humanos</option>
+                        <option value="PS">PS - Proyectos</option>
+                        <option value="WM">WM - Warehouse</option>
+                        <option value="Basis">Basis</option>
+                        <option value="Cross">Cross Module</option>
+                    </select>
+                    <button class="btn-clear-filters" onclick="clearFiltersDesarrollos()">Limpiar</button>
+                </div>
+            </div>
+            
             <div class="table-container">
-                <div class="loading" id="loading-desarrollos"><div class="spinner"></div>Cargando...</div>
-                <table id="table-desarrollos" style="display:none;">
-                    <thead><tr><th>Nombre</th><th>Tipo</th><th>Módulo</th><th>Desarrollador</th><th>Estado</th><th>Complejidad</th><th>OT</th><th>Inicio</th><th>Fin</th><th>Descripción</th><th>Acciones</th></tr></thead>
-                    <tbody id="tbody-desarrollos"></tbody>
+                <table id="desarrollosTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Módulo SAP</th>
+                            <th>Funcional</th>
+                            <th>Desarrollador</th>
+                            <th>Estado</th>
+                            <th>OT</th>
+                            <th>F. Inicio</th>
+                            <th>F. Término</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="desarrollosBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="tab-fiori" class="tab-content">
-            <div class="controls">
-                <button class="btn btn-success" onclick="showModal('fiori')">➕ Nueva Publicación</button>
-                <button class="btn btn-export" onclick="exportToCSV('fiori')">📊 Exportar CSV</button>
-                <select class="filter-select" id="filter-ambiente-fiori" onchange="applyFilters('fiori')">
-                    <option value="">Todos los ambientes</option>
-                    <option value="DES">DES</option>
-                    <option value="QAS">QAS</option>
-                    <option value="PRD">PRD</option>
-                </select>
-                <select class="filter-select" id="filter-estado-fiori" onchange="applyFilters('fiori')">
-                    <option value="">Todos los estados</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="publicado">Publicado</option>
-                    <option value="error">Error</option>
-                </select>
-                <input type="text" class="search-box" id="search-fiori" placeholder="🔍 Buscar..." oninput="applyFilters('fiori')">
+        <!-- Tab Content: Fiori -->
+        <div class="tab-content" id="fiori">
+            <div class="section-header">
+                <h2>Aplicaciones Fiori Launchpad</h2>
+                <button class="btn-primary" onclick="openModal('fioriModal')">+ Nueva Aplicación</button>
             </div>
+            
+            <!-- Filtros Fiori -->
+            <div class="filters-container">
+                <div class="search-box">
+                    <input type="text" id="searchFiori" placeholder="Buscar por ID, nombre, semantic object...">
+                </div>
+                <div class="filter-group">
+                    <select class="filter-select" id="filterFioriTipo">
+                        <option value="">Todos los Tipos</option>
+                        <option value="App Fiori">App Fiori</option>
+                        <option value="Transacción Z">Transacción Z</option>
+                        <option value="Transacción Estándar">Transacción Estándar</option>
+                    </select>
+                    <select class="filter-select" id="filterFioriEstado">
+                        <option value="">Todos los Estados</option>
+                        <option value="Configuración">Configuración</option>
+                        <option value="Testing">Testing</option>
+                        <option value="Publicado">Publicado</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                    <button class="btn-clear-filters" onclick="clearFiltersFiori()">Limpiar</button>
+                </div>
+            </div>
+            
             <div class="table-container">
-                <div class="loading" id="loading-fiori"><div class="spinner"></div>Cargando...</div>
-                <table id="table-fiori" style="display:none;">
-                    <thead><tr><th>Nombre</th><th>ID Semántico</th><th>Catálogo</th><th>Grupo</th><th>Roles</th><th>URL</th><th>Estado</th><th>Ambiente</th><th>Fecha</th><th>Responsable</th><th>Acciones</th></tr></thead>
-                    <tbody id="tbody-fiori"></tbody>
+                <table id="fioriTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre App</th>
+                            <th>Tipo</th>
+                            <th>Semantic Object</th>
+                            <th>Catálogo</th>
+                            <th>Desarrollador</th>
+                            <th>Estado</th>
+                            <th>Fecha Publicación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fioriBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="tab-transportes" class="tab-content">
-            <div class="controls">
-                <button class="btn btn-success" onclick="showModal('transportes')">➕ Nuevo Transporte</button>
-                <button class="btn btn-export" onclick="exportToCSV('transportes')">📊 Exportar CSV</button>
-                <select class="filter-select" id="filter-estado-ot" onchange="applyFilters('transportes')">
-                    <option value="">Todos los estados</option>
-                    <option value="DES">DES</option>
-                    <option value="QAS">QAS</option>
-                    <option value="PRD">PRD</option>
-                    <option value="error">Error</option>
-                    <option value="pendiente">Pendiente</option>
-                </select>
-                <select class="filter-select" id="filter-prioridad" onchange="applyFilters('transportes')">
-                    <option value="">Todas las prioridades</option>
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-                <input type="text" class="search-box" id="search-transportes" placeholder="🔍 Buscar..." oninput="applyFilters('transportes')">
+        <!-- Tab Content: Transportes -->
+        <div class="tab-content" id="transportes">
+            <div class="section-header">
+                <h2>Órdenes de Transporte</h2>
+                <button class="btn-primary" onclick="openModal('transportesModal')">+ Nueva Orden</button>
             </div>
+            
+            <!-- Filtros Transportes -->
+            <div class="filters-container">
+                <div class="search-box">
+                    <input type="text" id="searchTransportes" placeholder="Buscar por orden, descripción, solicitante...">
+                </div>
+                <div class="filter-group">
+                    <select class="filter-select" id="filterTransportesTipo">
+                        <option value="">Todos los Tipos</option>
+                        <option value="Workbench">Workbench</option>
+                        <option value="Customizing">Customizing</option>
+                        <option value="Copy">Copy</option>
+                        <option value="Relocation">Relocation</option>
+                    </select>
+                    <select class="filter-select" id="filterTransportesAmbiente">
+                        <option value="">Todos los Ambientes</option>
+                        <option value="DEV">DEV</option>
+                        <option value="QAS">QAS</option>
+                        <option value="PRD">PRD</option>
+                    </select>
+                    <select class="filter-select" id="filterTransportesEstado">
+                        <option value="">Todos los Estados</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En Revisión">En Revisión</option>
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="Liberado">Liberado</option>
+                        <option value="Transportado">Transportado</option>
+                    </select>
+                    <button class="btn-clear-filters" onclick="clearFiltersTransportes()">Limpiar</button>
+                </div>
+            </div>
+            
             <div class="table-container">
-                <div class="loading" id="loading-transportes"><div class="spinner"></div>Cargando...</div>
-                <table id="table-transportes" style="display:none;">
-                    <thead><tr><th>Orden</th><th>Tipo</th><th>Descripción</th><th>Desarrollador</th><th>Creación</th><th>DES</th><th>QAS</th><th>PRD</th><th>Estado</th><th>Prioridad</th><th>Objetos</th><th>Acciones</th></tr></thead>
-                    <tbody id="tbody-transportes"></tbody>
+                <table id="transportesTable">
+                    <thead>
+                        <tr>
+                            <th>Orden</th>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Ambiente</th>
+                            <th>Estado</th>
+                            <th>Solicitante</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transportesBody"></tbody>
                 </table>
             </div>
         </div>
-    </div>
 
-    <div id="modal-desarrollos" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('desarrollos')">&times;</span>
-            <h2 id="modal-title-desarrollos">Nuevo Desarrollo</h2>
-            <form id="form-desarrollos">
-                <div class="form-row">
-                    <div class="form-group"><label>Nombre *</label><input type="text" id="dev-nombre" required></div>
-                    <div class="form-group"><label>Tipo *</label><select id="dev-tipo" required><option value="">Seleccionar</option><option value="Programa ABAP">Programa ABAP</option><option value="Clase">Clase</option><option value="Function Module">Function Module</option><option value="Smartform">Smartform</option><option value="Adobe Form">Adobe Form</option><option value="CDS View">CDS View</option><option value="Fiori App">Fiori App</option><option value="Enhancement">Enhancement</option><option value="BADI">BADI</option><option value="Tabla Z">Tabla Z</option></select></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Módulo *</label><select id="dev-modulo" required><option value="">Seleccionar</option><option value="FI">FI</option><option value="CO">CO</option><option value="SD">SD</option><option value="MM">MM</option><option value="PP">PP</option><option value="HR">HR</option><option value="PM">PM</option><option value="QM">QM</option><option value="WM">WM</option><option value="BASIS">BASIS</option></select></div>
-                    <div class="form-group"><label>Desarrollador *</label><input type="text" id="dev-desarrollador" required></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Estado *</label><select id="dev-estado" required><option value="">Seleccionar</option><option value="pendiente">Pendiente</option><option value="desarrollo">En Desarrollo</option><option value="pruebas">En Pruebas</option><option value="completado">Completado</option></select></div>
-                    <div class="form-group"><label>Complejidad *</label><select id="dev-complejidad" required><option value="">Seleccionar</option><option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta</option></select></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>OT Asociada</label><input type="text" id="dev-ot"></div>
-                    <div class="form-group"><label>Fecha Inicio *</label><input type="date" id="dev-fecha-inicio" required></div>
-                </div>
-                <div class="form-group"><label>Fecha Fin</label><input type="date" id="dev-fecha-fin"></div>
-                <div class="form-group"><label>Descripción *</label><textarea id="dev-descripcion" required></textarea></div>
-                <div class="form-group"><label>Observaciones</label><textarea id="dev-observaciones"></textarea></div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-success">💾 Guardar</button>
-                    <button type="button" class="btn btn-danger" onclick="closeModal('desarrollos')">❌ Cancelar</button>
-                </div>
-            </form>
+        <!-- Modal Desarrollos -->
+        <div id="desarrollosModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('desarrollosModal')">&times;</span>
+                <h2 id="desarrollosModalTitle">Nuevo Desarrollo</h2>
+                <form id="desarrollosForm">
+                    <input type="hidden" id="desarrollo_key">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ID Desarrollo: *</label>
+                            <input type="text" id="desarrollo_id" required placeholder="Ej: Z_REP_001">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre: *</label>
+                            <input type="text" id="desarrollo_nombre" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo: *</label>
+                            <select id="desarrollo_tipo" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Report">Report</option>
+                                <option value="Function">Function</option>
+                                <option value="Class">Class</option>
+                                <option value="Enhancement">Enhancement</option>
+                                <option value="WebService">Web Service</option>
+                                <option value="Smartform">Smartform</option>
+                                <option value="Adobe Form">Adobe Form</option>
+                                <option value="BADI">BADI</option>
+                                <option value="User Exit">User Exit</option>
+                                <option value="BTE">BTE</option>
+                                <option value="Workflow">Workflow</option>
+                                <option value="Interface">Interface</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Módulo SAP: *</label>
+                            <select id="desarrollo_modulo" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="FI">FI - Finanzas</option>
+                                <option value="CO">CO - Controlling</option>
+                                <option value="MM">MM - Materiales</option>
+                                <option value="SD">SD - Ventas</option>
+                                <option value="PP">PP - Producción</option>
+                                <option value="QM">QM - Calidad</option>
+                                <option value="PM">PM - Mantenimiento</option>
+                                <option value="HR">HR - Recursos Humanos</option>
+                                <option value="PS">PS - Proyectos</option>
+                                <option value="WM">WM - Warehouse</option>
+                                <option value="Basis">Basis</option>
+                                <option value="Cross">Cross Module</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Funcional: *</label>
+                            <input type="text" id="desarrollo_funcional" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Desarrollador: *</label>
+                            <input type="text" id="desarrollo_desarrollador" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Estado: *</label>
+                            <select id="desarrollo_estado" required>
+                                <option value="Planificado">Planificado</option>
+                                <option value="En Desarrollo">En Desarrollo</option>
+                                <option value="Testing QAS">Testing QAS</option>
+                                <option value="En Producción">En Producción</option>
+                                <option value="Completado">Completado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Orden Transporte:</label>
+                            <input type="text" id="desarrollo_ot" placeholder="Opcional">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha Inicio: *</label>
+                            <input type="date" id="desarrollo_fecha_inicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Término:</label>
+                            <input type="date" id="desarrollo_fecha_termino">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Guardar</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('desarrollosModal')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Fiori -->
+        <div id="fioriModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('fioriModal')">&times;</span>
+                <h2 id="fioriModalTitle">Nueva Aplicación Fiori</h2>
+                <form id="fioriForm">
+                    <input type="hidden" id="fiori_key">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ID Aplicación: *</label>
+                            <input type="text" id="fiori_id" required placeholder="Ej: FIORI_001">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre Aplicación: *</label>
+                            <input type="text" id="fiori_nombre" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo Aplicación: *</label>
+                            <select id="fiori_tipo" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="App Fiori">App Fiori</option>
+                                <option value="Transacción Z">Transacción Z</option>
+                                <option value="Transacción Estándar">Transacción Estándar</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Semantic Object: *</label>
+                            <input type="text" id="fiori_semantic" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Catálogo: *</label>
+                            <input type="text" id="fiori_catalogo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Desarrollador: *</label>
+                            <input type="text" id="fiori_desarrollador" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Estado: *</label>
+                            <select id="fiori_estado" required>
+                                <option value="Configuración">Configuración</option>
+                                <option value="Testing">Testing</option>
+                                <option value="Publicado">Publicado</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Publicación: *</label>
+                            <input type="date" id="fiori_fecha" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Guardar</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('fioriModal')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Transportes -->
+        <div id="transportesModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('transportesModal')">&times;</span>
+                <h2 id="transportesModalTitle">Nueva Orden de Transporte</h2>
+                <form id="transportesForm">
+                    <input type="hidden" id="transporte_key">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Orden de Transporte: *</label>
+                            <input type="text" id="transporte_orden" required placeholder="Ej: DEVK900123">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo Orden: *</label>
+                            <select id="transporte_tipo" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Workbench">Workbench</option>
+                                <option value="Customizing">Customizing</option>
+                                <option value="Copy">Copy</option>
+                                <option value="Relocation">Relocation</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción: *</label>
+                        <input type="text" id="transporte_descripcion" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ambiente: *</label>
+                            <select id="transporte_ambiente" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="DEV">Desarrollo (DEV)</option>
+                                <option value="QAS">Calidad (QAS)</option>
+                                <option value="PRD">Producción (PRD)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado: *</label>
+                            <select id="transporte_estado" required>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En Revisión">En Revisión</option>
+                                <option value="Aprobado">Aprobado</option>
+                                <option value="Liberado">Liberado</option>
+                                <option value="Transportado">Transportado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Solicitante: *</label>
+                            <input type="text" id="transporte_solicitante" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha: *</label>
+                            <input type="date" id="transporte_fecha" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Guardar</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('transportesModal')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <div id="modal-fiori" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('fiori')">&times;</span>
-            <h2 id="modal-title-fiori">Nueva Publicación Fiori</h2>
-            <form id="form-fiori">
-                <div class="form-row">
-                    <div class="form-group"><label>Nombre *</label><input type="text" id="fiori-nombre" required></div>
-                    <div class="form-group"><label>ID Semántico *</label><input type="text" id="fiori-id" required></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Catálogo *</label><input type="text" id="fiori-catalogo" required></div>
-                    <div class="form-group"><label>Grupo *</label><input type="text" id="fiori-grupo" required></div>
-                </div>
-                <div class="form-group"><label>Roles *</label><input type="text" id="fiori-roles" required></div>
-                <div class="form-group"><label>URL *</label><input type="url" id="fiori-url" required></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Estado *</label><select id="fiori-estado" required><option value="">Seleccionar</option><option value="pendiente">Pendiente</option><option value="publicado">Publicado</option><option value="error">Error</option></select></div>
-                    <div class="form-group"><label>Ambiente *</label><select id="fiori-ambiente" required><option value="">Seleccionar</option><option value="DES">DES</option><option value="QAS">QAS</option><option value="PRD">PRD</option></select></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Fecha</label><input type="datetime-local" id="fiori-fecha"></div>
-                    <div class="form-group"><label>Responsable *</label><input type="text" id="fiori-responsable" required></div>
-                </div>
-                <div class="form-group"><label>Observaciones</label><textarea id="fiori-observaciones"></textarea></div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-success">💾 Guardar</button>
-                    <button type="button" class="btn btn-danger" onclick="closeModal('fiori')">❌ Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
     </div>
 
-    <div id="modal-transportes" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('transportes')">&times;</span>
-            <h2 id="modal-title-transportes">Nueva Orden de Transporte</h2>
-            <form id="form-transportes">
-                <div class="form-row">
-                    <div class="form-group"><label>Número *</label><input type="text" id="ot-numero" required></div>
-                    <div class="form-group"><label>Tipo *</label><select id="ot-tipo" required><option value="">Seleccionar</option><option value="Desarrollo">Desarrollo</option><option value="Corrección">Corrección</option><option value="Customizing">Customizing</option><option value="Master Data">Master Data</option><option value="Autorización">Autorización</option></select></div>
-                </div>
-                <div class="form-group"><label>Descripción *</label><textarea id="ot-descripcion" required></textarea></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Desarrollador *</label><input type="text" id="ot-desarrollador" required></div>
-                    <div class="form-group"><label>Fecha Creación *</label><input type="date" id="ot-fecha-creacion" required></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Estado *</label><select id="ot-estado" required><option value="">Seleccionar</option><option value="pendiente">Pendiente</option><option value="DES">DES</option><option value="QAS">QAS</option><option value="PRD">PRD</option><option value="error">Error</option></select></div>
-                    <div class="form-group"><label>Prioridad *</label><select id="ot-prioridad" required><option value="">Seleccionar</option><option value="alta">Alta</option><option value="media">Media</option><option value="baja">Baja</option></select></div>
-                </div>
-                <div class="form-group"><label>Ambientes:</label><div class="checkbox-group"><label><input type="checkbox" id="ot-passed-des"> DES</label><label><input type="checkbox" id="ot-passed-qas"> QAS</label><label><input type="checkbox" id="ot-passed-prd"> PRD</label></div></div>
-                <div class="form-group"><label>Objetos</label><textarea id="ot-objetos"></textarea></div>
-                <div class="form-group"><label>Fecha Transporte</label><input type="datetime-local" id="ot-fecha-transporte"></div>
-                <div class="form-group"><label>Observaciones</label><textarea id="ot-observaciones"></textarea></div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-success">💾 Guardar</button>
-                    <button type="button" class="btn btn-danger" onclick="closeModal('transportes')">❌ Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="notification" class="notification"></div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
