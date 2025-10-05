@@ -186,7 +186,7 @@ function renderDesarrollos(data) {
                 <td>${item.ot || '-'}</td>
                 <td>${item.fecha_inicio}</td>
                 <td>${item.fecha_termino || '-'}</td>
-                <td>
+                <td style="white-space: nowrap;">
                     <button class="btn-edit" onclick="editDesarrollo('${key}')">✏️</button>
                     <button class="btn-delete" onclick="deleteDesarrollo('${key}')">🗑️</button>
                 </td>
@@ -211,7 +211,8 @@ function handleDesarrolloSubmit(e) {
         estado: document.getElementById('desarrollo_estado').value,
         ot: document.getElementById('desarrollo_ot').value || null,
         fecha_inicio: document.getElementById('desarrollo_fecha_inicio').value,
-        fecha_termino: document.getElementById('desarrollo_fecha_termino').value || null
+        fecha_termino: document.getElementById('desarrollo_fecha_termino').value || null,
+        observaciones: document.getElementById('desarrollo_observaciones').value || null
     };
     
     if (key) {
@@ -245,6 +246,7 @@ function editDesarrollo(key) {
         document.getElementById('desarrollo_ot').value = data.ot || '';
         document.getElementById('desarrollo_fecha_inicio').value = data.fecha_inicio;
         document.getElementById('desarrollo_fecha_termino').value = data.fecha_termino || '';
+        document.getElementById('desarrollo_observaciones').value = data.observaciones || '';
         document.getElementById('desarrollosModalTitle').textContent = 'Editar Desarrollo';
         document.getElementById('desarrollo_id').disabled = true;
         openModal('desarrollosModal');
@@ -307,7 +309,7 @@ function renderFiori(data) {
     tbody.innerHTML = '';
     
     if (!data || Object.keys(data).length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No se encontraron aplicaciones</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No se encontraron aplicaciones</td></tr>';
         return;
     }
     
@@ -317,12 +319,13 @@ function renderFiori(data) {
                 <td><strong>${item.id}</strong></td>
                 <td>${item.nombre}</td>
                 <td><span class="badge badge-qas">${item.tipo}</span></td>
+                <td>${item.tx_app}</td>
                 <td>${item.semantic}</td>
                 <td>${item.catalogo}</td>
                 <td>${item.desarrollador}</td>
                 <td><span class="badge badge-${normalizeClass(item.estado)}">${item.estado}</span></td>
                 <td>${item.fecha}</td>
-                <td>
+                <td style="white-space: nowrap;">
                     <button class="btn-edit" onclick="editFiori('${key}')">✏️</button>
                     <button class="btn-delete" onclick="deleteFiori('${key}')">🗑️</button>
                 </td>
@@ -341,6 +344,7 @@ function handleFioriSubmit(e) {
         id: document.getElementById('fiori_id').value,
         nombre: document.getElementById('fiori_nombre').value,
         tipo: document.getElementById('fiori_tipo').value,
+        tx_app: document.getElementById('fiori_tx_app').value,
         semantic: document.getElementById('fiori_semantic').value,
         catalogo: document.getElementById('fiori_catalogo').value,
         desarrollador: document.getElementById('fiori_desarrollador').value,
@@ -372,6 +376,7 @@ function editFiori(key) {
         document.getElementById('fiori_id').value = data.id;
         document.getElementById('fiori_nombre').value = data.nombre;
         document.getElementById('fiori_tipo').value = data.tipo;
+        document.getElementById('fiori_tx_app').value = data.tx_app;
         document.getElementById('fiori_semantic').value = data.semantic;
         document.getElementById('fiori_catalogo').value = data.catalogo;
         document.getElementById('fiori_desarrollador').value = data.desarrollador;
@@ -453,9 +458,9 @@ function renderTransportes(data) {
                 <td>${item.descripcion}</td>
                 <td><span class="badge badge-${item.ambiente.toLowerCase()}">${item.ambiente}</span></td>
                 <td><span class="badge badge-${normalizeClass(item.estado)}">${item.estado}</span></td>
-                <td>${item.solicitante}</td>
+                <td>${item.usuario_sap}</td>
                 <td>${item.fecha}</td>
-                <td>
+                <td style="white-space: nowrap;">
                     <button class="btn-edit" onclick="editTransporte('${key}')">✏️</button>
                     <button class="btn-delete" onclick="deleteTransporte('${key}')">🗑️</button>
                 </td>
@@ -476,7 +481,7 @@ function handleTransporteSubmit(e) {
         descripcion: document.getElementById('transporte_descripcion').value,
         ambiente: document.getElementById('transporte_ambiente').value,
         estado: document.getElementById('transporte_estado').value,
-        solicitante: document.getElementById('transporte_solicitante').value,
+        usuario_sap: document.getElementById('transporte_usuario_sap').value,
         fecha: document.getElementById('transporte_fecha').value
     };
     
@@ -506,7 +511,7 @@ function editTransporte(key) {
         document.getElementById('transporte_descripcion').value = data.descripcion;
         document.getElementById('transporte_ambiente').value = data.ambiente;
         document.getElementById('transporte_estado').value = data.estado;
-        document.getElementById('transporte_solicitante').value = data.solicitante;
+        document.getElementById('transporte_usuario_sap').value = data.usuario_sap;
         document.getElementById('transporte_fecha').value = data.fecha;
         document.getElementById('transportesModalTitle').textContent = 'Editar Orden de Transporte';
         openModal('transportesModal');
@@ -535,17 +540,17 @@ function updateKPIs() {
         const fiori = fioriSnap.val() || {};
         const transportes = transportesSnap.val() || {};
         
-        // KPIs Desarrollos
+        // KPIs Desarrollos - Nueva lógica
         const desarrollosArray = Object.values(desarrollos);
         const totalDesarrollos = desarrollosArray.length;
-        const desarrollosDEV = desarrollosArray.filter(d => d.estado === 'En Desarrollo' || d.estado === 'Planificado').length;
-        const desarrollosQAS = desarrollosArray.filter(d => d.estado === 'Testing QAS').length;
-        const desarrollosPRD = desarrollosArray.filter(d => d.estado === 'En Producción' || d.estado === 'Completado').length;
+        const desarrollosPendientes = desarrollosArray.filter(d => d.estado === 'PENDIENTE').length;
+        const desarrollosTerminados = desarrollosArray.filter(d => d.estado === 'TERMINADO').length;
+        const desarrollosEnProceso = totalDesarrollos - desarrollosPendientes - desarrollosTerminados;
         
         animateNumber('totalDesarrollos', totalDesarrollos);
-        animateNumber('desarrollosDEV', desarrollosDEV);
-        animateNumber('desarrollosQAS', desarrollosQAS);
-        animateNumber('desarrollosPRD', desarrollosPRD);
+        animateNumber('desarrollosPendientes', desarrollosPendientes);
+        animateNumber('desarrollosEnProceso', desarrollosEnProceso);
+        animateNumber('desarrollosTerminados', desarrollosTerminados);
         
         // KPIs Fiori
         const fioriArray = Object.values(fiori);

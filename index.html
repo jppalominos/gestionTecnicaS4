@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Técnico SAP</title>
+    <title>Gestión Técnica SAP</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🚀 Control Técnico - Proyecto SAP</h1>
+            <h1>🚀 Gestión Técnica - Proyecto SAP</h1>
             <div class="header-info">
                 <span id="currentDate"></span>
                 <span id="firebaseStatus" class="status-badge">🔴 Desconectado</span>
@@ -29,16 +29,16 @@
                         <p>Total Desarrollos</p>
                     </div>
                     <div class="kpi-card-small">
-                        <h4 id="desarrollosDEV" class="kpi-orange">0</h4>
-                        <p>En DEV</p>
+                        <h4 id="desarrollosPendientes" class="kpi-orange">0</h4>
+                        <p>Pendientes</p>
                     </div>
                     <div class="kpi-card-small">
-                        <h4 id="desarrollosQAS" class="kpi-orange">0</h4>
-                        <p>En QAS</p>
+                        <h4 id="desarrollosEnProceso" class="kpi-orange">0</h4>
+                        <p>En Proceso</p>
                     </div>
                     <div class="kpi-card-small">
-                        <h4 id="desarrollosPRD" class="kpi-orange">0</h4>
-                        <p>En PRD</p>
+                        <h4 id="desarrollosTerminados" class="kpi-orange">0</h4>
+                        <p>Terminados</p>
                     </div>
                 </div>
             </div>
@@ -55,11 +55,11 @@
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="fioriEstandar" class="kpi-dark">0</h4>
-                        <p>Tx Estándar</p>
+                        <p>Trx Estándar</p>
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="fioriZ" class="kpi-dark">0</h4>
-                        <p>Tx Z</p>
+                        <p>Trx Z</p>
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="fioriApps" class="kpi-dark">0</h4>
@@ -76,19 +76,19 @@
                 <div class="kpi-grid">
                     <div class="kpi-card-small">
                         <h4 id="totalOTs" class="kpi-red">0</h4>
-                        <p>Total OTs</p>
+                        <p>Total Órdenes</p>
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="otsDEV" class="kpi-red">0</h4>
-                        <p>DEV</p>
+                        <p>Desarrollo</p>
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="otsQAS" class="kpi-red">0</h4>
-                        <p>QAS</p>
+                        <p>Calidad</p>
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="otsPRD" class="kpi-red">0</h4>
-                        <p>PRD</p>
+                        <p>Producción</p>
                     </div>
                 </div>
             </div>
@@ -96,9 +96,9 @@
 
         <!-- Navigation Tabs -->
         <nav class="tabs">
-            <button class="tab-btn active" data-tab="desarrollos">Desarrollos</button>
+            <button class="tab-btn active" data-tab="desarrollos">Listado Desarrollos</button>
             <button class="tab-btn" data-tab="fiori">Fiori Launchpad</button>
-            <button class="tab-btn" data-tab="transportes">Órdenes Transporte</button>
+            <button class="tab-btn" data-tab="transportes">Órdenes de Transporte</button>
         </nav>
 
         <!-- Tab Content: Desarrollos -->
@@ -128,14 +128,21 @@
                         <option value="BTE">BTE</option>
                         <option value="Workflow">Workflow</option>
                         <option value="Interface">Interface</option>
+                        <option value="App Fiori">App Fiori</option>
+                        <option value="Programa Integración">Programa Integración</option>
                     </select>
                     <select class="filter-select" id="filterDesarrollosEstado">
                         <option value="">Todos los Estados</option>
-                        <option value="Planificado">Planificado</option>
-                        <option value="En Desarrollo">En Desarrollo</option>
-                        <option value="Testing QAS">Testing QAS</option>
-                        <option value="En Producción">En Producción</option>
-                        <option value="Completado">Completado</option>
+                        <option value="PENDIENTE">PENDIENTE</option>
+                        <option value="SIN ETF">SIN ETF</option>
+                        <option value="VALIDACION ETF">VALIDACION ETF</option>
+                        <option value="ETF OK">ETF OK</option>
+                        <option value="ETF DEVUELTA">ETF DEVUELTA</option>
+                        <option value="EN DESARROLLO">EN DESARROLLO</option>
+                        <option value="COPIADO EN DESARROLLO">COPIADO EN DESARROLLO</option>
+                        <option value="COPIADO COMPLETO">COPIADO COMPLETO</option>
+                        <option value="EN PRUEBAS">EN PRUEBAS</option>
+                        <option value="TERMINADO">TERMINADO</option>
                     </select>
                     <select class="filter-select" id="filterDesarrollosModulo">
                         <option value="">Todos los Módulos</option>
@@ -163,13 +170,13 @@
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Tipo</th>
-                            <th>Módulo SAP</th>
+                            <th>Módulo</th>
                             <th>Funcional</th>
                             <th>Desarrollador</th>
                             <th>Estado</th>
                             <th>OT</th>
-                            <th>F. Inicio</th>
-                            <th>F. Término</th>
+                            <th>Fec.Inicio</th>
+                            <th>Fec.Término</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -215,11 +222,12 @@
                             <th>ID</th>
                             <th>Nombre App</th>
                             <th>Tipo</th>
+                            <th>Tx / App</th>
                             <th>Semantic Object</th>
                             <th>Catálogo</th>
                             <th>Desarrollador</th>
                             <th>Estado</th>
-                            <th>Fecha Publicación</th>
+                            <th>Fecha Publ.</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -275,8 +283,8 @@
                             <th>Descripción</th>
                             <th>Ambiente</th>
                             <th>Estado</th>
-                            <th>Solicitante</th>
-                            <th>Fecha</th>
+                            <th>Usuario SAP</th>
+                            <th>Fecha Creación</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -319,6 +327,8 @@
                                 <option value="BTE">BTE</option>
                                 <option value="Workflow">Workflow</option>
                                 <option value="Interface">Interface</option>
+                                <option value="App Fiori">App Fiori</option>
+                                <option value="Programa Integración">Programa Integración</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -354,11 +364,16 @@
                         <div class="form-group">
                             <label>Estado: *</label>
                             <select id="desarrollo_estado" required>
-                                <option value="Planificado">Planificado</option>
-                                <option value="En Desarrollo">En Desarrollo</option>
-                                <option value="Testing QAS">Testing QAS</option>
-                                <option value="En Producción">En Producción</option>
-                                <option value="Completado">Completado</option>
+                                <option value="PENDIENTE">PENDIENTE</option>
+                                <option value="SIN ETF">SIN ETF</option>
+                                <option value="VALIDACION ETF">VALIDACION ETF</option>
+                                <option value="ETF OK">ETF OK</option>
+                                <option value="ETF DEVUELTA">ETF DEVUELTA</option>
+                                <option value="EN DESARROLLO">EN DESARROLLO</option>
+                                <option value="COPIADO EN DESARROLLO">COPIADO EN DESARROLLO</option>
+                                <option value="COPIADO COMPLETO">COPIADO COMPLETO</option>
+                                <option value="EN PRUEBAS">EN PRUEBAS</option>
+                                <option value="TERMINADO">TERMINADO</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -375,6 +390,10 @@
                             <label>Fecha Término:</label>
                             <input type="date" id="desarrollo_fecha_termino">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observaciones:</label>
+                        <textarea id="desarrollo_observaciones" rows="3" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; font-family: inherit; resize: vertical;" placeholder="Ingrese observaciones opcionales..."></textarea>
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn-primary">Guardar</button>
@@ -411,6 +430,12 @@
                                 <option value="Transacción Estándar">Transacción Estándar</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label>Tx / App: *</label>
+                            <input type="text" id="fiori_tx_app" required placeholder="Ej: SE38 o ZMI_APP">
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Semantic Object: *</label>
                             <input type="text" id="fiori_semantic" required>
@@ -499,11 +524,11 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Solicitante: *</label>
-                            <input type="text" id="transporte_solicitante" required>
+                            <label>Usuario SAP: *</label>
+                            <input type="text" id="transporte_usuario_sap" required>
                         </div>
                         <div class="form-group">
-                            <label>Fecha: *</label>
+                            <label>Fecha Creación: *</label>
                             <input type="date" id="transporte_fecha" required>
                         </div>
                     </div>
