@@ -69,12 +69,12 @@ function setupTabs() {
 
 function switchTab(tabName) {
     currentTab = tabName;
-    
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-    
+
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
@@ -95,17 +95,16 @@ function setupFilters() {
     document.getElementById('filterDesarrollosTipo').addEventListener('change', applyFiltersDesarrollos);
     document.getElementById('filterDesarrollosEstado').addEventListener('change', applyFiltersDesarrollos);
     document.getElementById('filterDesarrollosModulo').addEventListener('change', applyFiltersDesarrollos);
-    
+
     // Fiori
     document.getElementById('searchFiori').addEventListener('input', applyFiltersFiori);
     document.getElementById('filterFioriTipo').addEventListener('change', applyFiltersFiori);
     document.getElementById('filterFioriEstado').addEventListener('change', applyFiltersFiori);
-    
+
     // Transportes
     document.getElementById('searchTransportes').addEventListener('input', applyFiltersTransportes);
     document.getElementById('filterTransportesTipo').addEventListener('change', applyFiltersTransportes);
     document.getElementById('filterTransportesAmbiente').addEventListener('change', applyFiltersTransportes);
-    document.getElementById('filterTransportesEstado').addEventListener('change', applyFiltersTransportes);
 }
 
 // Cargar todos los datos
@@ -138,21 +137,21 @@ function applyFiltersDesarrollos() {
     const filterTipo = document.getElementById('filterDesarrollosTipo').value;
     const filterEstado = document.getElementById('filterDesarrollosEstado').value;
     const filterModulo = document.getElementById('filterDesarrollosModulo').value;
-    
+
     const filtered = Object.entries(allDesarrollos).filter(([key, item]) => {
-        const matchSearch = !searchTerm || 
+        const matchSearch = !searchTerm ||
             item.id.toLowerCase().includes(searchTerm) ||
             item.nombre.toLowerCase().includes(searchTerm) ||
             item.desarrollador.toLowerCase().includes(searchTerm) ||
             item.funcional.toLowerCase().includes(searchTerm);
-        
+
         const matchTipo = !filterTipo || item.tipo === filterTipo;
         const matchEstado = !filterEstado || item.estado === filterEstado;
         const matchModulo = !filterModulo || item.modulo === filterModulo;
-        
+
         return matchSearch && matchTipo && matchEstado && matchModulo;
     });
-    
+
     renderDesarrollos(Object.fromEntries(filtered));
 }
 
@@ -167,12 +166,12 @@ function clearFiltersDesarrollos() {
 function renderDesarrollos(data) {
     const tbody = document.getElementById('desarrollosBody');
     tbody.innerHTML = '';
-    
+
     if (!data || Object.keys(data).length === 0) {
         tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">No se encontraron desarrollos</td></tr>';
         return;
     }
-    
+
     Object.entries(data).forEach(([key, item]) => {
         const row = `
             <tr>
@@ -199,7 +198,7 @@ function renderDesarrollos(data) {
 function handleDesarrolloSubmit(e) {
     e.preventDefault();
     showLoading();
-    
+
     const key = document.getElementById('desarrollo_key').value;
     const data = {
         id: document.getElementById('desarrollo_id').value,
@@ -214,7 +213,7 @@ function handleDesarrolloSubmit(e) {
         fecha_termino: document.getElementById('desarrollo_fecha_termino').value || null,
         observaciones: document.getElementById('desarrollo_observaciones').value || null
     };
-    
+
     if (key) {
         desarrollosRef.child(key).update(data).then(() => {
             hideLoading();
@@ -280,20 +279,20 @@ function applyFiltersFiori() {
     const searchTerm = document.getElementById('searchFiori').value.toLowerCase();
     const filterTipo = document.getElementById('filterFioriTipo').value;
     const filterEstado = document.getElementById('filterFioriEstado').value;
-    
+
     const filtered = Object.entries(allFiori).filter(([key, item]) => {
-        const matchSearch = !searchTerm || 
+        const matchSearch = !searchTerm ||
             item.id.toLowerCase().includes(searchTerm) ||
             item.nombre.toLowerCase().includes(searchTerm) ||
             item.semantic.toLowerCase().includes(searchTerm) ||
             item.desarrollador.toLowerCase().includes(searchTerm);
-        
+
         const matchTipo = !filterTipo || item.tipo === filterTipo;
         const matchEstado = !filterEstado || item.estado === filterEstado;
-        
+
         return matchSearch && matchTipo && matchEstado;
     });
-    
+
     renderFiori(Object.fromEntries(filtered));
 }
 
@@ -307,12 +306,12 @@ function clearFiltersFiori() {
 function renderFiori(data) {
     const tbody = document.getElementById('fioriBody');
     tbody.innerHTML = '';
-    
+
     if (!data || Object.keys(data).length === 0) {
         tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No se encontraron aplicaciones</td></tr>';
         return;
     }
-    
+
     Object.entries(data).forEach(([key, item]) => {
         const row = `
             <tr>
@@ -338,7 +337,7 @@ function renderFiori(data) {
 function handleFioriSubmit(e) {
     e.preventDefault();
     showLoading();
-    
+
     const key = document.getElementById('fiori_key').value;
     const data = {
         id: document.getElementById('fiori_id').value,
@@ -351,7 +350,7 @@ function handleFioriSubmit(e) {
         estado: document.getElementById('fiori_estado').value,
         fecha: document.getElementById('fiori_fecha').value
     };
-    
+
     if (key) {
         fioriRef.child(key).update(data).then(() => {
             hideLoading();
@@ -415,21 +414,19 @@ function applyFiltersTransportes() {
     const searchTerm = document.getElementById('searchTransportes').value.toLowerCase();
     const filterTipo = document.getElementById('filterTransportesTipo').value;
     const filterAmbiente = document.getElementById('filterTransportesAmbiente').value;
-    const filterEstado = document.getElementById('filterTransportesEstado').value;
-    
+
     const filtered = Object.entries(allTransportes).filter(([key, item]) => {
-        const matchSearch = !searchTerm || 
+        const matchSearch = !searchTerm ||
             item.orden.toLowerCase().includes(searchTerm) ||
             item.descripcion.toLowerCase().includes(searchTerm) ||
-            item.solicitante.toLowerCase().includes(searchTerm);
-        
+            item.usuario_sap.toLowerCase().includes(searchTerm);
+
         const matchTipo = !filterTipo || item.tipo === filterTipo;
         const matchAmbiente = !filterAmbiente || item.ambiente === filterAmbiente;
-        const matchEstado = !filterEstado || item.estado === filterEstado;
-        
-        return matchSearch && matchTipo && matchAmbiente && matchEstado;
+
+        return matchSearch && matchTipo && matchAmbiente;
     });
-    
+
     renderTransportes(Object.fromEntries(filtered));
 }
 
@@ -437,27 +434,27 @@ function clearFiltersTransportes() {
     document.getElementById('searchTransportes').value = '';
     document.getElementById('filterTransportesTipo').value = '';
     document.getElementById('filterTransportesAmbiente').value = '';
-    document.getElementById('filterTransportesEstado').value = '';
     applyFiltersTransportes();
 }
 
 function renderTransportes(data) {
     const tbody = document.getElementById('transportesBody');
     tbody.innerHTML = '';
-    
+
     if (!data || Object.keys(data).length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No se encontraron órdenes</td></tr>';
         return;
     }
-    
+
     Object.entries(data).forEach(([key, item]) => {
+        const noTransportar = item.no_transportar ? '✅' : '❌';
         const row = `
             <tr>
                 <td><strong>${item.orden}</strong></td>
                 <td><span class="badge badge-dev">${item.tipo}</span></td>
                 <td>${item.descripcion}</td>
                 <td><span class="badge badge-${item.ambiente.toLowerCase()}">${item.ambiente}</span></td>
-                <td><span class="badge badge-${normalizeClass(item.estado)}">${item.estado}</span></td>
+                <td style="text-align: center; font-size: 1.2rem;">${noTransportar}</td>
                 <td>${item.usuario_sap}</td>
                 <td>${item.fecha}</td>
                 <td style="white-space: nowrap;">
@@ -473,18 +470,19 @@ function renderTransportes(data) {
 function handleTransporteSubmit(e) {
     e.preventDefault();
     showLoading();
-    
+
     const key = document.getElementById('transporte_key').value;
     const data = {
         orden: document.getElementById('transporte_orden').value,
         tipo: document.getElementById('transporte_tipo').value,
         descripcion: document.getElementById('transporte_descripcion').value,
         ambiente: document.getElementById('transporte_ambiente').value,
-        estado: document.getElementById('transporte_estado').value,
+        no_transportar: document.getElementById('transporte_no_transportar').checked,
         usuario_sap: document.getElementById('transporte_usuario_sap').value,
-        fecha: document.getElementById('transporte_fecha').value
+        fecha: document.getElementById('transporte_fecha').value,
+        observaciones: document.getElementById('transporte_observaciones').value || null
     };
-    
+
     if (key) {
         transportesRef.child(key).update(data).then(() => {
             hideLoading();
@@ -510,9 +508,10 @@ function editTransporte(key) {
         document.getElementById('transporte_tipo').value = data.tipo;
         document.getElementById('transporte_descripcion').value = data.descripcion;
         document.getElementById('transporte_ambiente').value = data.ambiente;
-        document.getElementById('transporte_estado').value = data.estado;
+        document.getElementById('transporte_no_transportar').checked = data.no_transportar || false;
         document.getElementById('transporte_usuario_sap').value = data.usuario_sap;
         document.getElementById('transporte_fecha').value = data.fecha;
+        document.getElementById('transporte_observaciones').value = data.observaciones || '';
         document.getElementById('transportesModalTitle').textContent = 'Editar Orden de Transporte';
         openModal('transportesModal');
     });
@@ -539,38 +538,38 @@ function updateKPIs() {
         const desarrollos = desarrollosSnap.val() || {};
         const fiori = fioriSnap.val() || {};
         const transportes = transportesSnap.val() || {};
-        
+
         // KPIs Desarrollos - Nueva lógica
         const desarrollosArray = Object.values(desarrollos);
         const totalDesarrollos = desarrollosArray.length;
         const desarrollosPendientes = desarrollosArray.filter(d => d.estado === 'PENDIENTE').length;
         const desarrollosTerminados = desarrollosArray.filter(d => d.estado === 'TERMINADO').length;
         const desarrollosEnProceso = totalDesarrollos - desarrollosPendientes - desarrollosTerminados;
-        
+
         animateNumber('totalDesarrollos', totalDesarrollos);
         animateNumber('desarrollosPendientes', desarrollosPendientes);
         animateNumber('desarrollosEnProceso', desarrollosEnProceso);
         animateNumber('desarrollosTerminados', desarrollosTerminados);
-        
+
         // KPIs Fiori
         const fioriArray = Object.values(fiori);
         const totalFiori = fioriArray.length;
         const fioriEstandar = fioriArray.filter(f => f.tipo === 'Transacción Estándar').length;
         const fioriZ = fioriArray.filter(f => f.tipo === 'Transacción Z').length;
         const fioriApps = fioriArray.filter(f => f.tipo === 'App Fiori').length;
-        
+
         animateNumber('totalFiori', totalFiori);
         animateNumber('fioriEstandar', fioriEstandar);
         animateNumber('fioriZ', fioriZ);
         animateNumber('fioriApps', fioriApps);
-        
-        // KPIs Transportes
+
+        // KPIs Transportes - Excluir las marcadas como "No Transportar" en conteos por ambiente
         const transportesArray = Object.values(transportes);
         const totalOTs = transportesArray.length;
-        const otsDEV = transportesArray.filter(t => t.ambiente === 'DEV').length;
-        const otsQAS = transportesArray.filter(t => t.ambiente === 'QAS').length;
-        const otsPRD = transportesArray.filter(t => t.ambiente === 'PRD').length;
-        
+        const otsDEV = transportesArray.filter(t => t.ambiente === 'DEV' && !t.no_transportar).length;
+        const otsQAS = transportesArray.filter(t => t.ambiente === 'QAS' && !t.no_transportar).length;
+        const otsPRD = transportesArray.filter(t => t.ambiente === 'PRD' && !t.no_transportar).length;
+
         animateNumber('totalOTs', totalOTs);
         animateNumber('otsDEV', otsDEV);
         animateNumber('otsQAS', otsQAS);
@@ -582,23 +581,23 @@ function updateKPIs() {
 function animateNumber(elementId, targetValue) {
     const element = document.getElementById(elementId);
     const currentValue = parseInt(element.textContent) || 0;
-    
+
     if (currentValue === targetValue) return;
-    
+
     element.classList.add('updating');
-    
+
     const duration = 800;
     const steps = 30;
     const stepValue = (targetValue - currentValue) / steps;
     const stepDuration = duration / steps;
-    
+
     let current = currentValue;
     let step = 0;
-    
+
     const timer = setInterval(() => {
         step++;
         current += stepValue;
-        
+
         if (step >= steps) {
             element.textContent = targetValue;
             clearInterval(timer);
@@ -615,7 +614,7 @@ function animateNumber(elementId, targetValue) {
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.add('show');
-    
+
     if (modalId === 'desarrollosModal' && !document.getElementById('desarrollo_key').value) {
         document.getElementById('desarrollosForm').reset();
         document.getElementById('desarrollosModalTitle').textContent = 'Nuevo Desarrollo';
@@ -635,7 +634,7 @@ function openModal(modalId) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.remove('show');
-    
+
     if (modalId === 'desarrollosModal') {
         document.getElementById('desarrollosForm').reset();
         document.getElementById('desarrollo_key').value = '';
@@ -653,7 +652,7 @@ function closeModal(modalId) {
 }
 
 // Cerrar modal al hacer click fuera
-window.onclick = function(event) {
+window.onclick = function (event) {
     if (event.target.classList.contains('modal')) {
         event.target.classList.remove('show');
     }
