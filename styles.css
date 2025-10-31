@@ -18,6 +18,7 @@ body {
     background: linear-gradient(135deg, var(--seidor-dark) 0%, var(--seidor-gray) 100%);
     min-height: 100vh;
     padding: 20px;
+    overflow-x: hidden;
 }
 
 .container {
@@ -33,7 +34,7 @@ body {
 header {
     background: linear-gradient(135deg, var(--seidor-dark) 0%, var(--seidor-gray) 100%);
     color: white;
-    padding: 35px 40px;
+    padding: 25px 40px;
     position: relative;
     overflow: hidden;
 }

@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión Técnica SAP</title>
+    <title>Control Técnico SAP</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🚀 Gestión Técnica - Proyecto SAP</h1>
-            <div class="header-info">
-                <span id="currentDate"></span>
-                <span id="firebaseStatus" class="status-badge">🔴 Desconectado</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <h1>🚀 Gestión Técnica - Proyecto SAP</h1>
+                <div class="header-info">
+                    <span id="currentDate"></span>
+                    <span id="firebaseStatus" class="status-badge">🔴 Desconectado</span>
+                </div>
             </div>
         </header>
 
@@ -80,15 +82,15 @@
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="otsDEV" class="kpi-red">0</h4>
-                        <p>Desarrollo</p>
+                        <p>En Desarrollo</p>
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="otsQAS" class="kpi-red">0</h4>
-                        <p>Calidad</p>
+                        <p>En Calidad</p>
                     </div>
                     <div class="kpi-card-small">
                         <h4 id="otsPRD" class="kpi-red">0</h4>
-                        <p>Producción</p>
+                        <p>En Producción</p>
                     </div>
                 </div>
             </div>
@@ -96,9 +98,9 @@
 
         <!-- Navigation Tabs -->
         <nav class="tabs">
-            <button class="tab-btn active" data-tab="desarrollos">Listado Desarrollos</button>
+            <button class="tab-btn active" data-tab="desarrollos">Desarrollos</button>
             <button class="tab-btn" data-tab="fiori">Fiori Launchpad</button>
-            <button class="tab-btn" data-tab="transportes">Órdenes de Transporte</button>
+            <button class="tab-btn" data-tab="transportes">Órdenes Transporte</button>
         </nav>
 
         <!-- Tab Content: Desarrollos -->
@@ -175,8 +177,8 @@
                             <th>Desarrollador</th>
                             <th>Estado</th>
                             <th>OT</th>
-                            <th>Fec.Inicio</th>
-                            <th>Fec.Término</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Término</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -219,7 +221,7 @@
                 <table id="fioriTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th style="min-width: 120px;">ID</th>
                             <th>Nombre App</th>
                             <th>Tipo</th>
                             <th>Tx / App</th>
@@ -227,7 +229,7 @@
                             <th>Catálogo</th>
                             <th>Desarrollador</th>
                             <th>Estado</th>
-                            <th>Fecha Publ.</th>
+                            <th style="width: 100px;">Fecha Pub.</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -246,7 +248,7 @@
             <!-- Filtros Transportes -->
             <div class="filters-container">
                 <div class="search-box">
-                    <input type="text" id="searchTransportes" placeholder="Buscar por orden, descripción, solicitante...">
+                    <input type="text" id="searchTransportes" placeholder="Buscar por orden, descripción, usuario SAP...">
                 </div>
                 <div class="filter-group">
                     <select class="filter-select" id="filterTransportesTipo">
@@ -262,14 +264,6 @@
                         <option value="QAS">QAS</option>
                         <option value="PRD">PRD</option>
                     </select>
-                    <select class="filter-select" id="filterTransportesEstado">
-                        <option value="">Todos los Estados</option>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="En Revisión">En Revisión</option>
-                        <option value="Aprobado">Aprobado</option>
-                        <option value="Liberado">Liberado</option>
-                        <option value="Transportado">Transportado</option>
-                    </select>
                     <button class="btn-clear-filters" onclick="clearFiltersTransportes()">Limpiar</button>
                 </div>
             </div>
@@ -282,7 +276,7 @@
                             <th>Tipo</th>
                             <th>Descripción</th>
                             <th>Ambiente</th>
-                            <th>Estado</th>
+                            <th>No Transportar</th>
                             <th>Usuario SAP</th>
                             <th>Fecha Creación</th>
                             <th>Acciones</th>
@@ -512,14 +506,10 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Estado: *</label>
-                            <select id="transporte_estado" required>
-                                <option value="Pendiente">Pendiente</option>
-                                <option value="En Revisión">En Revisión</option>
-                                <option value="Aprobado">Aprobado</option>
-                                <option value="Liberado">Liberado</option>
-                                <option value="Transportado">Transportado</option>
-                            </select>
+                            <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                                <input type="checkbox" id="transporte_no_transportar" style="width: auto; margin-right: 10px; cursor: pointer;">
+                                <span>No Transportar</span>
+                            </label>
                         </div>
                     </div>
                     <div class="form-row">
@@ -531,6 +521,10 @@
                             <label>Fecha Creación: *</label>
                             <input type="date" id="transporte_fecha" required>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observaciones:</label>
+                        <textarea id="transporte_observaciones" rows="3" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; font-family: inherit; resize: vertical;" placeholder="Ingrese observaciones opcionales..."></textarea>
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn-primary">Guardar</button>
